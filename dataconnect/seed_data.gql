@@ -1,0 +1,106 @@
+mutation SeedDatabase @transaction @auth(level: PUBLIC, insecureReason: "This operation is safe to expose to the public for demo purposes") {
+  user_insertMany(data: [
+    {
+      id: "647744a1-78c2-44f5-b7f2-a54a3c88307f",
+      createdAt: "2024-07-04T00:00:00Z",
+      displayName: "Alice",
+      email: "alice@example.com",
+      phoneNumber: "123-456-7890",
+      role: "admin",
+      shippingAddress: "123 Main St"
+    },
+    {
+      id: "7a0d78d7-9a42-46e1-989a-765c90a85f4d",
+      createdAt: "2024-07-04T00:00:00Z",
+      displayName: "Bob",
+      email: "bob@example.com",
+      phoneNumber: "987-654-3210",
+      role: "customer",
+      shippingAddress: "456 Elm St"
+    }
+  ])
+  product_insertMany(data: [
+    {
+      id: "a1b2c3d4-e5f6-4789-a0b1-c2d3e4f5a6b7",
+      assemblyTimeEstimate: "30 minutes",
+      createdAt: "2024-07-04T00:00:00Z",
+      description: "Ergonomic chair",
+      dimensions: "24x24x40",
+      imageUrl: "https://example.com/chair.jpg",
+      materials: "Mesh, metal",
+      name: "Office Chair",
+      price: 150.00,
+      weight: 20.5
+    },
+    {
+      id: "f8e7d6c5-b4a3-4920-9c1d-e2f1d0c9b8a9",
+      assemblyTimeEstimate: "15 minutes",
+      createdAt: "2024-07-04T00:00:00Z",
+      description: "Adjustable desk lamp",
+      dimensions: "12x6x18",
+      imageUrl: "https://example.com/lamp.jpg",
+      materials: "Metal, plastic",
+      name: "Desk Lamp",
+      price: 45.00,
+      weight: 3.2
+    }
+  ])
+  order_insertMany(data: [
+    {
+      id: "11223344-5566-4789-a0b1-c2d3e4f5a6b7",
+      userId: "647744a1-78c2-44f5-b7f2-a54a3c88307f",
+      orderDate: "2024-07-05T00:00:00Z",
+      shippingAddress: "123 Main St",
+      status: "pending",
+      totalAmount: 195.00
+    },
+    {
+      id: "99887766-5544-4789-a0b1-c2d3e4f5a6b7",
+      userId: "7a0d78d7-9a42-46e1-989a-765c90a85f4d",
+      orderDate: "2024-07-06T00:00:00Z",
+      shippingAddress: "456 Elm St",
+      status: "completed",
+      totalAmount: 45.00
+    }
+  ])
+  orderItem_insertMany(data: [
+    {
+      orderId: "11223344-5566-4789-a0b1-c2d3e4f5a6b7",
+      productId: "a1b2c3d4-e5f6-4789-a0b1-c2d3e4f5a6b7",
+      quantity: 1,
+      unitPrice: 150.00
+    },
+    {
+      orderId: "11223344-5566-4789-a0b1-c2d3e4f5a6b7",
+      productId: "f8e7d6c5-b4a3-4920-9c1d-e2f1d0c9b8a9",
+      quantity: 1,
+      unitPrice: 45.00
+    },
+    {
+      orderId: "99887766-5544-4789-a0b1-c2d3e4f5a6b7",
+      productId: "f8e7d6c5-b4a3-4920-9c1d-e2f1d0c9b8a9",
+      quantity: 1,
+      unitPrice: 45.00
+    }
+  ])
+  assemblyInstruction_insertMany(data: [
+    {
+      id: "b1c2d3e4-f5a6-4789-a0b1-c2d3e4f5a6b7",
+      productId: "a1b2c3d4-e5f6-4789-a0b1-c2d3e4f5a6b7",
+      description: "Attach the back to the seat",
+      imageUrl: "https://example.com/chair_step1.jpg",
+      stepNumber: 1,
+      title: "Attach Back",
+      videoUrl: "https://example.com/chair_step1.mp4"
+    },
+    {
+      id: "c8d7e6f5-a4b3-4920-9c1d-e2f1d0c9b8a9",
+      productId: "f8e7d6c5-b4a3-4920-9c1d-e2f1d0c9b8a9",
+      description: "Attach the shade to the base",
+      imageUrl: "https://example.com/lamp_step1.jpg",
+      stepNumber: 1,
+      title: "Attach Shade",
+      videoUrl: "https://example.com/lamp_step1.mp4"
+    }
+  ])
+}

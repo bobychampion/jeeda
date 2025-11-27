@@ -1,0 +1,7 @@
+node_modules/
+.env
+*.log
+.DS_Store
+coupleit-firebase-adminsdk-*.json
+format-firebase-credentials.js
+

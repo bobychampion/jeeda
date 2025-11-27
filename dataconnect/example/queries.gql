@@ -1,0 +1,38 @@
+mutation CreateUser @auth(level: USER) {
+  user_insert(data: {
+    id_expr: "uuidV4()",
+    createdAt_expr: "request.time",
+    displayName: "New User",
+    role: "member"
+  })
+}
+
+query ListProducts @auth(level: PUBLIC, insecureReason: "This operation is safe to expose to the public") {
+  products {
+    id
+    name
+    description
+    price
+    imageUrl
+  }
+}
+
+mutation UpdateProduct($id: UUID!, $price: Float!) @auth(level: USER) {
+  product_update(
+    key: { id: $id }
+    data: {
+      price: $price
+    }
+  )
+}
+
+query ListAssemblyInstructionsForProduct($productId: UUID!) @auth(level: PUBLIC, insecureReason: "This operation is safe to expose to the public") {
+  assemblyInstructions(where: {productId: {eq: $productId}}) {
+    id
+    title
+    description
+    imageUrl
+    stepNumber
+    videoUrl
+  }
+}
