@@ -270,13 +270,18 @@ export async function enhanceTemplateData(req, res) {
     // Import Hugging Face service
     const { generateChatResponse } = await import('../services/huggingFaceService.js');
 
-    // Fetch existing categories for suggestions
+    // Fetch existing categories for suggestions (optional - continue even if it fails)
     let categories = [];
     try {
-      const categoriesSnapshot = await db.collection('categories').get();
-      categories = categoriesSnapshot.docs.map(doc => doc.data().name).filter(Boolean);
+      if (db && typeof db.collection === 'function') {
+        const categoriesSnapshot = await db.collection('categories').get();
+        categories = categoriesSnapshot.docs.map(doc => doc.data().name).filter(Boolean);
+      } else {
+        console.warn('Firebase Admin not initialized, skipping category fetch');
+      }
     } catch (error) {
-      console.warn('Error fetching categories:', error);
+      console.warn('Error fetching categories (continuing without them):', error.message);
+      // Continue without categories - AI can still work
     }
 
     // Build prompt for AI enhancement

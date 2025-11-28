@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: replique-backend
+    name: jeeda-backend
     env: node
     buildCommand: npm install
     startCommand: npm start
@@ -10,4 +10,6 @@ services:
       - key: PORT
         value: 10000
     # Add your environment variables in Render dashboard
+    # Required: FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY
+    # Optional: GEMINI_API_KEY, HUGGINGFACE_API_KEY, CLOUDINARY_*, SMTP_*, PAYSTACK_*
 

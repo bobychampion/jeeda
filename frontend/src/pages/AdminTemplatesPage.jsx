@@ -11,7 +11,7 @@ import { Plus, Edit, Trash2, X, Bot, Sparkles, Upload, Loader2 } from 'lucide-re
 import { API_URL } from '../config/api.js';
 
 export default function AdminTemplatesPage() {
-  const { userData } = useAuth();
+  const { userData, currentUser } = useAuth();
   const navigate = useNavigate();
   const [templates, setTemplates] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -52,6 +52,7 @@ export default function AdminTemplatesPage() {
   const [showNewCategoryInput, setShowNewCategoryInput] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState('');
   const [creatingCategory, setCreatingCategory] = useState(false);
+  const [assigningCategories, setAssigningCategories] = useState(false);
 
   useEffect(() => {
     if (userData?.role !== 'admin') {
@@ -129,12 +130,19 @@ export default function AdminTemplatesPage() {
 
     setAssigningCategories(true);
     try {
-      // API_URL is imported from config/api.js
+      // Get auth token
+      const token = currentUser ? await currentUser.getIdToken() : localStorage.getItem('authToken');
       
+      if (!token) {
+        throw new Error('You must be logged in to perform this action');
+      }
+      
+      // API_URL is imported from config/api.js
       const response = await fetch(`${API_URL}/api/templates/assign-categories`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
       });
 
@@ -368,13 +376,21 @@ export default function AdminTemplatesPage() {
 
     setAiEnhancing(true);
     try {
-      // API_URL is imported from config/api.js
+      // Get auth token (optional for this endpoint, but good practice)
+      const token = currentUser ? await currentUser.getIdToken() : localStorage.getItem('authToken');
       
+      const headers = {
+        'Content-Type': 'application/json',
+      };
+      
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      
+      // API_URL is imported from config/api.js
       const response = await fetch(`${API_URL}/api/ai/enhance-template`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers,
         body: JSON.stringify({
           name: formData.name,
           description: formData.description,
