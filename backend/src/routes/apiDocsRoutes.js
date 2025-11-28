@@ -8,30 +8,35 @@ router.get('/', (req, res) => {
     baseUrl: `${req.protocol}://${req.get('host')}`,
     endpoints: [
       {
-        category: 'Health Check',
+        category: 'Health Check & Diagnostics',
         routes: [
-          { method: 'GET', path: '/health', description: 'Check if the API is running', auth: false },
+          { method: 'GET', path: '/health', description: 'Check if the API is running', auth: false, status: 'working' },
+          { method: 'GET', path: '/api/ai/diagnostics', description: 'Comprehensive API diagnostics - check all services (Firebase, Hugging Face, Cloudinary, Email)', auth: false, status: 'working' },
         ],
       },
       {
         category: 'Templates',
         routes: [
-          { method: 'GET', path: '/api/templates', description: 'Get all templates', auth: false },
-          { method: 'GET', path: '/api/templates/:id', description: 'Get a specific template', auth: false },
-          { method: 'GET', path: '/api/templates/category/:category', description: 'Get templates by category', auth: false },
-          { method: 'POST', path: '/api/templates', description: 'Create a new template', auth: true, admin: true },
-          { method: 'PUT', path: '/api/templates/:id', description: 'Update a template', auth: true, admin: true },
-          { method: 'DELETE', path: '/api/templates/:id', description: 'Delete a template', auth: true, admin: true },
+          { method: 'GET', path: '/api/templates', description: 'Get all templates', auth: false, status: 'working' },
+          { method: 'GET', path: '/api/templates/:id', description: 'Get a specific template', auth: false, status: 'working' },
+          { method: 'GET', path: '/api/templates/category/:category', description: 'Get templates by category', auth: false, status: 'working' },
+          { method: 'POST', path: '/api/templates', description: 'Create a new template', auth: true, admin: true, status: 'working' },
+          { method: 'PUT', path: '/api/templates/:id', description: 'Update a template', auth: true, admin: true, status: 'working' },
+          { method: 'DELETE', path: '/api/templates/:id', description: 'Delete a template', auth: true, admin: true, status: 'working' },
+          { method: 'POST', path: '/api/templates/assign-categories', description: 'Randomly assign templates to categories', auth: true, admin: true, status: 'disabled', note: 'This feature has been disabled. Templates now use their original category assignment.' },
         ],
       },
       {
         category: 'AI Services',
         routes: [
-          { method: 'POST', path: '/api/ai/recommend', description: 'Get AI recommendations based on user query', auth: false, body: { query: 'string' } },
-          { method: 'POST', path: '/api/ai/recolor', description: 'Recolor a template image', auth: false, body: { templateId: 'string', color: 'string', material: 'string' } },
-          { method: 'POST', path: '/api/ai/generate-furniture', description: 'Generate furniture image from text prompt', auth: false, body: { prompt: 'string', style: 'string', width: 'number', height: 'number' } },
-          { method: 'GET', path: '/api/ai/prompt-settings', description: 'Get AI prompt settings (Admin)', auth: true, admin: true },
-          { method: 'POST', path: '/api/ai/prompt-settings', description: 'Update AI prompt settings (Admin)', auth: true, admin: true },
+          { method: 'POST', path: '/api/ai/recommend', description: 'Get AI recommendations based on user query', auth: false, body: { query: 'string' }, status: 'working' },
+          { method: 'POST', path: '/api/ai/enhance-template', description: 'Enhance template data using AI (for admin template form)', auth: false, body: { name: 'string', description: 'string', category: 'string', currentData: 'object' }, status: 'working', note: 'Returns fallback data if AI service unavailable' },
+          { method: 'GET', path: '/api/ai/status', description: 'Check template database status (diagnostic)', auth: false, status: 'working' },
+          { method: 'GET', path: '/api/ai/diagnostics', description: 'Comprehensive API diagnostics - check all services status', auth: false, status: 'working' },
+          { method: 'GET', path: '/api/ai/prompt-settings', description: 'Get AI prompt settings (Admin)', auth: true, admin: true, status: 'working' },
+          { method: 'POST', path: '/api/ai/prompt-settings', description: 'Update AI prompt settings (Admin)', auth: true, admin: true, status: 'working' },
+          { method: 'POST', path: '/api/ai/recolor', description: 'Recolor a template image', auth: false, body: { templateId: 'string', color: 'string', material: 'string' }, status: 'disabled', note: 'AI image generation feature removed' },
+          { method: 'POST', path: '/api/ai/generate-furniture', description: 'Generate furniture image from text prompt', auth: false, body: { prompt: 'string', style: 'string', width: 'number', height: 'number' }, status: 'disabled', note: 'AI image generation feature removed' },
         ],
       },
       {
@@ -188,6 +193,23 @@ router.get('/', (req, res) => {
         .badge.auth { background: #ffc107; color: #000; }
         .badge.admin { background: #dc3545; color: white; }
         .badge.body { background: #17a2b8; color: white; }
+        .badge.working { background: #28a745; color: white; }
+        .badge.disabled { background: #6c757d; color: white; }
+        .badge.warning { background: #ffc107; color: #000; }
+        .note {
+            margin-top: 10px;
+            padding: 10px;
+            background: #fff3cd;
+            border-left: 3px solid #ffc107;
+            border-radius: 4px;
+            font-size: 0.9em;
+            color: #856404;
+        }
+        .note.error {
+            background: #f8d7da;
+            border-left-color: #dc3545;
+            color: #721c24;
+        }
         .body-info {
             margin-top: 10px;
             padding: 10px;
@@ -225,10 +247,18 @@ router.get('/', (req, res) => {
                             </div>
                             <div class="description">${route.description}</div>
                             <div class="badges">
+                                ${route.status === 'working' ? '<span class="badge working">✅ Working</span>' : ''}
+                                ${route.status === 'disabled' ? '<span class="badge disabled">❌ Disabled</span>' : ''}
+                                ${route.status === 'partial' ? '<span class="badge warning">⚠️ Partial</span>' : ''}
                                 ${route.auth ? '<span class="badge auth">🔒 Auth Required</span>' : ''}
                                 ${route.admin ? '<span class="badge admin">👑 Admin Only</span>' : ''}
                                 ${route.body ? '<span class="badge body">📦 Body Required</span>' : ''}
                             </div>
+                            ${route.note ? `
+                                <div class="note ${route.status === 'disabled' ? 'error' : ''}">
+                                    <strong>Note:</strong> ${route.note}
+                                </div>
+                            ` : ''}
                             ${route.body ? `
                                 <div class="body-info">
                                     <strong>Request Body:</strong><br>
