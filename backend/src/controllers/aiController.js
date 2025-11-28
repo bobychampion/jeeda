@@ -316,7 +316,25 @@ Please enhance this template data. Make the description professional, engaging, 
 <|assistant|>`;
 
     console.log('Generating AI enhancement for template...');
-    const responseText = await generateChatResponse(prompt);
+    
+    let responseText;
+    try {
+      responseText = await generateChatResponse(prompt);
+    } catch (aiError) {
+      console.error('AI service error:', aiError);
+      // If AI fails, return a basic enhancement based on the input
+      const fallbackResult = {
+        description: description || `A beautiful ${name || 'furniture piece'} for your home. This custom piece combines functionality with style, perfect for enhancing your living space.`,
+        category: category || 'Furniture',
+        searchKeywords: name ? [name.toLowerCase(), ...name.toLowerCase().split(' ')] : [],
+        roomTypes: category ? [category.toLowerCase()] : ['living room'],
+        useCases: ['home decor', 'functional furniture'],
+        difficulty: 'Beginner',
+        suggestedMaterials: ['wood', 'metal'],
+        suggestedColors: ['natural', 'white', 'black'],
+      };
+      return res.json(fallbackResult);
+    }
 
     // Parse JSON from response
     let jsonText = responseText.trim();
@@ -334,33 +352,52 @@ Please enhance this template data. Make the description professional, engaging, 
       console.error('Failed to parse AI enhancement response:', jsonText);
       // Fallback response
       result = {
-        description: description || 'A beautiful furniture piece for your home.',
+        description: description || `A beautiful ${name || 'furniture piece'} for your home. This custom piece combines functionality with style, perfect for enhancing your living space.`,
         category: category || 'Furniture',
-        searchKeywords: [],
-        roomTypes: [],
-        useCases: [],
+        searchKeywords: name ? [name.toLowerCase(), ...name.toLowerCase().split(' ')] : [],
+        roomTypes: category ? [category.toLowerCase()] : ['living room'],
+        useCases: ['home decor', 'functional furniture'],
         difficulty: 'Beginner',
-        suggestedMaterials: [],
-        suggestedColors: [],
+        suggestedMaterials: ['wood', 'metal'],
+        suggestedColors: ['natural', 'white', 'black'],
       };
     }
 
     res.json(result);
   } catch (error) {
     console.error('Error enhancing template data:', error);
+    console.error('Error stack:', error.stack);
     
-    let errorMessage = 'Failed to enhance template data';
-    if (error.message?.includes('API key')) {
-      errorMessage = 'AI service configuration error. Please check the Hugging Face API key.';
-    } else if (error.message?.includes('rate limit')) {
-      errorMessage = 'AI service is temporarily unavailable due to rate limits. Please try again later.';
-    } else if (error.message?.includes('loading')) {
-      errorMessage = 'AI model is currently loading. Please try again in a few moments.';
+    // Provide a fallback response instead of failing completely
+    const fallbackResult = {
+      description: description || `A beautiful ${name || 'furniture piece'} for your home. This custom piece combines functionality with style, perfect for enhancing your living space.`,
+      category: category || 'Furniture',
+      searchKeywords: name ? [name.toLowerCase(), ...name.toLowerCase().split(' ').filter(w => w.length > 2)] : [],
+      roomTypes: category ? [category.toLowerCase()] : ['living room'],
+      useCases: ['home decor', 'functional furniture'],
+      difficulty: 'Beginner',
+      suggestedMaterials: ['wood', 'metal'],
+      suggestedColors: ['natural', 'white', 'black'],
+      _fallback: true, // Flag to indicate this is a fallback response
+      _error: process.env.NODE_ENV === 'development' ? error.message : undefined,
+    };
+    
+    // Log the error but still return a useful response
+    let errorMessage = 'AI enhancement unavailable';
+    if (error.message?.includes('API key') || error.message?.includes('HUGGINGFACE_API_KEY')) {
+      errorMessage = 'AI service not configured. Please add HUGGINGFACE_API_KEY to backend environment variables.';
+      console.error('⚠️ HUGGINGFACE_API_KEY is missing in Render environment variables');
+    } else if (error.message?.includes('rate limit') || error.message?.includes('429')) {
+      errorMessage = 'AI service rate limit reached. Using basic enhancement.';
+    } else if (error.message?.includes('loading') || error.message?.includes('503')) {
+      errorMessage = 'AI model is loading. Using basic enhancement.';
     }
     
-    res.status(500).json({ 
-      error: errorMessage,
-      details: process.env.NODE_ENV === 'development' ? error.message : undefined
+    // Return 200 with fallback data instead of 500 error
+    // This way the UI can still use the basic enhancement
+    res.status(200).json({
+      ...fallbackResult,
+      _message: errorMessage,
     });
   }
 }
