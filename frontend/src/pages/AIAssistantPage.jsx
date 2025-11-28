@@ -54,15 +54,27 @@ export default function AIAssistantPage() {
       for (const message of messagesToLoad) {
         try {
           console.log('Loading template details for message:', message.recommendations);
-          const templatePromises = message.recommendations.map((id) => 
-            templatesService.getById(id).catch(err => {
+          const templatePromises = message.recommendations.map(async (id) => {
+            try {
+              const template = await templatesService.getById(id);
+              if (!template) {
+                console.warn(`Template with ID "${id}" not found in Firestore`);
+              }
+              return template;
+            } catch (err) {
               console.error(`Error loading template ${id}:`, err);
               return null;
-            })
-          );
+            }
+          });
           const templateDetails = (await Promise.all(templatePromises)).filter(t => t !== null);
           
-          console.log(`Loaded ${templateDetails.length} templates for message`);
+          console.log(`Loaded ${templateDetails.length} of ${message.recommendations.length} templates for message`);
+          if (templateDetails.length < message.recommendations.length) {
+            const missingIds = message.recommendations.filter(id => 
+              !templateDetails.some(t => t.id === id)
+            );
+            console.warn('Missing template IDs:', missingIds);
+          }
           
           // Update the message with template details
           setMessages(prev => prev.map(msg => 
@@ -185,17 +197,29 @@ export default function AIAssistantPage() {
       let templateDetails = [];
       if (result.recommendations && result.recommendations.length > 0) {
         console.log('Fetching templates for IDs:', result.recommendations);
-        const templatePromises = result.recommendations.map((id) => 
-          templatesService.getById(id).catch(err => {
+        const templatePromises = result.recommendations.map(async (id) => {
+          try {
+            const template = await templatesService.getById(id);
+            if (!template) {
+              console.warn(`Template with ID "${id}" not found in Firestore. This might be an invalid ID.`);
+            }
+            return template;
+          } catch (err) {
             console.error(`Error loading template ${id}:`, err);
             return null;
-          })
-        );
+          }
+        });
         templateDetails = (await Promise.all(templatePromises)).filter(t => t !== null);
         console.log(`Successfully loaded ${templateDetails.length} of ${result.recommendations.length} templates`);
         
         if (templateDetails.length === 0) {
           console.warn('No templates found for recommended IDs:', result.recommendations);
+          console.warn('This might indicate: 1) Invalid template IDs from AI, 2) Templates were deleted, or 3) Database connection issue');
+        } else if (templateDetails.length < result.recommendations.length) {
+          const missingIds = result.recommendations.filter(id => 
+            !templateDetails.some(t => t.id === id)
+          );
+          console.warn('Some template IDs could not be loaded:', missingIds);
         }
         
         setRecommendations(templateDetails);

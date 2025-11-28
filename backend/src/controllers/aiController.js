@@ -235,9 +235,14 @@ ${query}
 
     // Ensure we always return valid template IDs
     const validTemplateIds = templates.map(t => t.id);
+    const originalCount = finalRecommendations.length;
     finalRecommendations = finalRecommendations.filter(id => validTemplateIds.includes(id));
 
-    console.log(`Final recommendations: ${finalRecommendations.length} templates`);
+    if (originalCount > finalRecommendations.length) {
+      console.warn(`Filtered out ${originalCount - finalRecommendations.length} invalid template IDs`);
+    }
+
+    console.log(`Final recommendations: ${finalRecommendations.length} templates (IDs: ${finalRecommendations.slice(0, 5).join(', ')}${finalRecommendations.length > 5 ? '...' : ''})`);
 
     res.json({
       recommendations: finalRecommendations,
