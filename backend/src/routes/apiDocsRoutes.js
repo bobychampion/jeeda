@@ -52,17 +52,17 @@ router.get('/', (req, res) => {
       {
         category: 'Cart',
         routes: [
-          { method: 'GET', path: '/api/cart', description: 'Get user cart', auth: true },
-          { method: 'POST', path: '/api/cart', description: 'Add item to cart', auth: true, body: { templateId: 'string', quantity: 'number', customizations: 'object' } },
-          { method: 'PUT', path: '/api/cart/:itemId', description: 'Update cart item', auth: true, body: { quantity: 'number' } },
-          { method: 'DELETE', path: '/api/cart/:itemId', description: 'Remove item from cart', auth: true },
+          { method: 'GET', path: '/api/cart', description: 'Get user cart', auth: true, status: 'working' },
+          { method: 'POST', path: '/api/cart/add', description: 'Add item to cart', auth: true, body: { templateId: 'string', quantity: 'number', customizations: 'object' }, status: 'working' },
+          { method: 'PUT', path: '/api/cart/:itemId', description: 'Update cart item', auth: true, body: { quantity: 'number' }, status: 'working' },
+          { method: 'DELETE', path: '/api/cart/:itemId', description: 'Remove item from cart', auth: true, status: 'working' },
         ],
       },
       {
         category: 'Payments',
         routes: [
-          { method: 'POST', path: '/api/payments/initialize', description: 'Initialize Paystack payment', auth: true, body: { orderId: 'string', amount: 'number', email: 'string' } },
-          { method: 'POST', path: '/api/payments/verify', description: 'Verify Paystack payment', auth: true, body: { reference: 'string' } },
+          { method: 'POST', path: '/api/payments/initialize', description: 'Initialize Paystack payment', auth: true, body: { orderId: 'string', amount: 'number', email: 'string' }, status: 'working' },
+          { method: 'POST', path: '/api/payments/verify', description: 'Verify Paystack payment', auth: false, body: { reference: 'string' }, status: 'working' },
         ],
       },
       {
