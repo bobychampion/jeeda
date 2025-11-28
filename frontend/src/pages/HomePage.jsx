@@ -4,15 +4,13 @@ import Footer from '../components/common/Footer';
 import CategoryCard from '../components/cards/CategoryCard';
 import TemplateCard from '../components/cards/TemplateCard';
 import { Sparkles, ArrowRight, Zap, Shield, Users, TrendingUp } from 'lucide-react';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { templatesService } from '../services/firestoreService';
 import { categoryService } from '../services/categoryService';
 
 export default function HomePage() {
   const [featuredTemplates, setFeaturedTemplates] = useState([]);
   const [categories, setCategories] = useState([]);
-  const heroRef = useRef(null);
-  const featuresRef = useRef(null);
 
   useEffect(() => {
     // Fetch featured templates
@@ -63,26 +61,6 @@ export default function HomePage() {
         { id: 'office', name: 'Office', imageUrl: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80' },
       ]);
     });
-
-    // Scroll animations
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('animate-fade-in');
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
-
-    if (heroRef.current) observer.observe(heroRef.current);
-    if (featuresRef.current) observer.observe(featuresRef.current);
-
-    return () => {
-      if (heroRef.current) observer.unobserve(heroRef.current);
-      if (featuresRef.current) observer.unobserve(featuresRef.current);
-    };
   }, []);
 
   return (
@@ -100,8 +78,8 @@ export default function HomePage() {
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div className="opacity-0">
-              <div className="inline-flex items-center gap-2 bg-green-100 text-green-700 px-4 py-2 rounded-full text-sm font-semibold mb-6 animate-slide-in-left">
+            <div>
+              <div className="inline-flex items-center gap-2 bg-green-100 text-green-700 px-4 py-2 rounded-full text-sm font-semibold mb-6">
                 <Sparkles className="w-4 h-4" />
                 AI-Powered Furniture Design
               </div>
@@ -128,7 +106,7 @@ export default function HomePage() {
                 </Link>
               </div>
             </div>
-            <div className="opacity-0 relative">
+            <div className="relative">
               <div className="relative rounded-2xl overflow-hidden shadow-2xl transform hover:scale-105 transition-transform duration-500">
                 <div className="aspect-square bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center">
                   <div className="text-center text-white p-8">
@@ -148,7 +126,7 @@ export default function HomePage() {
       {/* Features Section */}
       <section ref={featuresRef} className="py-16 md:py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16 opacity-0">
+          <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
               Why Choose Jeeda?
             </h2>
@@ -188,7 +166,7 @@ export default function HomePage() {
               return (
                 <div
                   key={index}
-                  className="group opacity-0 bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2"
+                  className="group bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2"
                 >
                   <div className={`w-16 h-16 bg-gradient-to-br ${feature.color} rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
                     <Icon className="w-8 h-8 text-white" />
@@ -205,7 +183,7 @@ export default function HomePage() {
       {/* Explore by Category */}
       <section className="py-16 md:py-24 bg-gradient-to-b from-gray-50 to-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12 opacity-0">
+          <div className="text-center mb-12">
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
               Explore by Room
             </h2>
@@ -214,10 +192,8 @@ export default function HomePage() {
             </p>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
-            {categories.map((category, index) => (
-              <div key={category.id} className="opacity-0" style={{ animationDelay: `${index * 100}ms` }}>
-                <CategoryCard category={category} />
-              </div>
+            {categories.map((category) => (
+              <CategoryCard key={category.id} category={category} />
             ))}
           </div>
         </div>
@@ -226,7 +202,7 @@ export default function HomePage() {
       {/* Featured Templates */}
       <section className="py-16 md:py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12 opacity-0">
+          <div className="text-center mb-12">
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
               Featured Templates
             </h2>
@@ -236,17 +212,15 @@ export default function HomePage() {
           </div>
           <div className="grid md:grid-cols-3 gap-8">
             {featuredTemplates.length > 0 ? (
-              featuredTemplates.map((template, index) => (
-                <div key={template.id} className="opacity-0" style={{ animationDelay: `${index * 150}ms` }}>
-                  <TemplateCard template={template} />
-                </div>
+              featuredTemplates.map((template) => (
+                <TemplateCard key={template.id} template={template} />
               ))
             ) : (
               <p className="col-span-3 text-center text-gray-600">Loading templates...</p>
             )}
           </div>
           {featuredTemplates.length > 0 && (
-            <div className="text-center mt-12 opacity-0">
+            <div className="text-center mt-12">
               <Link
                 to="/categories"
                 className="inline-flex items-center gap-2 px-8 py-4 bg-green-600 text-white rounded-lg text-lg font-semibold hover:bg-green-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
@@ -261,7 +235,7 @@ export default function HomePage() {
 
       {/* CTA Section */}
       <section className="py-20 md:py-28 bg-gradient-to-br from-green-600 to-green-700 text-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center opacity-0">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-4xl md:text-5xl font-bold mb-6">
             Ready to Start Building?
           </h2>
