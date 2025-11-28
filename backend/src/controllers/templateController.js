@@ -2,7 +2,6 @@ import { db } from '../config/firebaseAdmin.js';
 import { Template } from '../models/Template.js';
 import { invalidateCache } from '../services/templateIndexService.js';
 import { Timestamp } from 'firebase-admin/firestore';
-import { Timestamp } from 'firebase-admin/firestore';
 
 /**
  * Get all templates with optional filters
