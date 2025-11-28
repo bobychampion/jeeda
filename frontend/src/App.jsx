@@ -26,6 +26,7 @@ import CustomRequestsPage from './pages/admin/CustomRequestsPage';
 import CustomRequestPage from './pages/CustomRequestPage';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
+import HowItWorksPage from './pages/HowItWorksPage';
 
 function App() {
   return (
@@ -37,6 +38,7 @@ function App() {
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/categories" element={<CategoryPage />} />
           <Route path="/categories/:categoryId" element={<CategoryPage />} />
+          <Route path="/how-it-works" element={<HowItWorksPage />} />
           <Route path="/templates/:id" element={<ProductDetailPage />} />
           <Route
             path="/ai-assistant"
