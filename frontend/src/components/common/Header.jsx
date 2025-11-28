@@ -31,9 +31,20 @@ export default function Header() {
             <Link to="/ai-assistant" className="text-text-dark hover:text-primary-green transition">
               AI Chat
             </Link>
-            <Link to="/how-it-works" className="text-text-dark hover:text-primary-green transition">
+            <a 
+              href="/#how-it-works" 
+              className="text-text-dark hover:text-primary-green transition"
+              onClick={(e) => {
+                e.preventDefault();
+                if (window.location.pathname === '/') {
+                  document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' });
+                } else {
+                  window.location.href = '/#how-it-works';
+                }
+              }}
+            >
               How it Works
-            </Link>
+            </a>
           </nav>
 
           {/* Right side */}

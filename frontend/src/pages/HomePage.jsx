@@ -117,7 +117,7 @@ export default function HomePage() {
       </section>
 
       {/* How It Works */}
-      <section className="py-16 bg-background-light">
+      <section id="how-it-works" className="py-16 bg-background-light">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold text-text-dark text-center mb-4">
             How It Works
