@@ -31,6 +31,17 @@ app.use(cors({
   ],
   credentials: true,
 }));
+
+// Request logging middleware (for debugging)
+app.use((req, res, next) => {
+  const timestamp = new Date().toISOString();
+  console.log(`[${timestamp}] ${req.method} ${req.path}`);
+  if (req.body && Object.keys(req.body).length > 0 && req.path !== '/api/ai/recommend') {
+    console.log(`  Body:`, JSON.stringify(req.body).substring(0, 200));
+  }
+  next();
+});
+
 // Increase payload size limit for file uploads
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
@@ -54,9 +65,19 @@ app.use('/api/custom-requests', customRequestRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-  console.error('Error:', err);
+  const timestamp = new Date().toISOString();
+  console.error(`[${timestamp}] ❌ ERROR on ${req.method} ${req.path}:`, {
+    message: err.message,
+    stack: err.stack,
+    code: err.code,
+    status: err.status,
+  });
   res.status(err.status || 500).json({
     error: err.message || 'Internal server error',
+    path: req.path,
+    method: req.method,
+    timestamp,
+    ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
   });
 });
 

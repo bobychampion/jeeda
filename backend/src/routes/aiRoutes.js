@@ -5,6 +5,7 @@ import {
   getPromptSettings,
   updatePromptSettings,
   checkTemplatesStatus,
+  checkApiStatus,
 } from '../controllers/aiController.js';
 
 const router = express.Router();
@@ -15,8 +16,9 @@ router.post('/recommend', getAIRecommendations);
 // AI Template Enhancement route (for admin template form)
 router.post('/enhance-template', enhanceTemplateData);
 
-// Diagnostic endpoint
-router.get('/status', checkTemplatesStatus);
+// Diagnostic endpoints
+router.get('/status', checkTemplatesStatus); // Legacy - template status only
+router.get('/diagnostics', checkApiStatus); // Comprehensive API diagnostics
 
 // Admin routes for prompt settings
 router.get('/prompt-settings', getPromptSettings);

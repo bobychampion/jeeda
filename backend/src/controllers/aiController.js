@@ -1,4 +1,4 @@
-import { db, isFirebaseInitialized, getInitializationError } from '../config/firebaseAdmin.js';
+import { db } from '../config/firebaseAdmin.js';
 import { searchTemplates, getTopMatchingTemplateIds } from '../services/templateSearchService.js';
 import { getCachedTemplates } from '../services/templateIndexService.js';
 
@@ -9,28 +9,14 @@ import { getCachedTemplates } from '../services/templateIndexService.js';
  * Phase 3: If AI fails, use keyword search results directly
  */
 export async function getAIRecommendations(req, res) {
+  const endpoint = 'recommend';
+  console.log(`[${endpoint}] Request received`);
+  
   try {
     const { query } = req.body;
 
     if (!query) {
       return res.status(400).json({ error: 'Query is required' });
-    }
-
-    // Check if Firebase is initialized
-    if (!isFirebaseInitialized() || !db) {
-      const initError = getInitializationError();
-      const errorMsg = initError?.message || 'Firebase Admin not initialized';
-      console.error('❌ Firebase Admin not initialized:', errorMsg);
-      
-      return res.json({
-        recommendations: [],
-        message: "I'm currently unable to access the template database. This is likely because Firebase credentials are not configured on the server. Please contact support.",
-        availableCategories: [],
-        debug: process.env.NODE_ENV === 'development' ? {
-          error: errorMsg,
-          hint: 'Add FIREBASE_PROJECT_ID, FIREBASE_PRIVATE_KEY, and FIREBASE_CLIENT_EMAIL to Render environment variables'
-        } : undefined
-      });
     }
 
     // Fetch templates (using cache for performance)
@@ -235,14 +221,9 @@ ${query}
 
     // Ensure we always return valid template IDs
     const validTemplateIds = templates.map(t => t.id);
-    const originalCount = finalRecommendations.length;
     finalRecommendations = finalRecommendations.filter(id => validTemplateIds.includes(id));
 
-    if (originalCount > finalRecommendations.length) {
-      console.warn(`Filtered out ${originalCount - finalRecommendations.length} invalid template IDs`);
-    }
-
-    console.log(`Final recommendations: ${finalRecommendations.length} templates (IDs: ${finalRecommendations.slice(0, 5).join(', ')}${finalRecommendations.length > 5 ? '...' : ''})`);
+    console.log(`Final recommendations: ${finalRecommendations.length} templates`);
 
     res.json({
       recommendations: finalRecommendations,
@@ -385,10 +366,14 @@ Please enhance this template data. Make the description professional, engaging, 
       };
     }
 
+    console.log(`[${endpoint}] ✓ Returning enhanced data`);
     res.json(result);
   } catch (error) {
-    console.error('Error enhancing template data:', error);
-    console.error('Error stack:', error.stack);
+    console.error(`[${endpoint}] ✗ ERROR:`, {
+      message: error.message,
+      stack: error.stack,
+      code: error.code,
+    });
     
     // Provide a fallback response instead of failing completely
     const fallbackResult = {
@@ -422,6 +407,134 @@ Please enhance this template data. Make the description professional, engaging, 
       _message: errorMessage,
     });
   }
+}
+
+/**
+ * Comprehensive diagnostic endpoint to check all API services
+ * This helps identify which API/service is failing
+ */
+export async function checkApiStatus(req, res) {
+  const diagnostics = {
+    timestamp: new Date().toISOString(),
+    services: {},
+    overall: 'unknown',
+  };
+
+  // 1. Check Firebase Admin (Firestore)
+  try {
+    if (!db) {
+      diagnostics.services.firebase = {
+        status: 'failed',
+        error: 'Firebase Admin not initialized - db is null',
+        hint: 'Check FIREBASE_PROJECT_ID, FIREBASE_PRIVATE_KEY, FIREBASE_CLIENT_EMAIL in environment variables',
+      };
+    } else {
+      const testQuery = await db.collection('templates').limit(1).get();
+      const templateCount = await db.collection('templates').count().get();
+      diagnostics.services.firebase = {
+        status: 'ok',
+        templatesFound: templateCount.data().count,
+        canQuery: testQuery.size >= 0,
+      };
+    }
+  } catch (error) {
+    diagnostics.services.firebase = {
+      status: 'failed',
+      error: error.message || error.toString(),
+      code: error.code,
+      hint: 'Firebase credentials may be missing or invalid in Render environment variables',
+    };
+  }
+
+  // 2. Check Hugging Face API
+  try {
+    const hasApiKey = !!process.env.HUGGINGFACE_API_KEY;
+    if (!hasApiKey) {
+      diagnostics.services.huggingFace = {
+        status: 'not_configured',
+        error: 'HUGGINGFACE_API_KEY not set in environment variables',
+        hint: 'Add HUGGINGFACE_API_KEY to Render environment variables',
+      };
+    } else {
+      // Try a simple test call
+      const { generateChatResponse } = await import('../services/huggingFaceService.js');
+      try {
+        // Quick test with minimal prompt
+        const testResponse = await Promise.race([
+          generateChatResponse('Say "OK"'),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout after 5s')), 5000)),
+        ]);
+        diagnostics.services.huggingFace = {
+          status: 'ok',
+          apiKeySet: true,
+          testResponse: testResponse.substring(0, 50),
+        };
+      } catch (testError) {
+        diagnostics.services.huggingFace = {
+          status: 'failed',
+          apiKeySet: true,
+          error: testError.message || testError.toString(),
+          hint: 'API key may be invalid or service may be down',
+        };
+      }
+    }
+  } catch (error) {
+    diagnostics.services.huggingFace = {
+      status: 'error',
+      error: error.message || error.toString(),
+    };
+  }
+
+  // 3. Check Cloudinary (if configured)
+  try {
+    const hasCloudinary = !!(process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY);
+    diagnostics.services.cloudinary = {
+      status: hasCloudinary ? 'configured' : 'not_configured',
+      cloudName: process.env.CLOUDINARY_CLOUD_NAME || 'not set',
+      apiKey: process.env.CLOUDINARY_API_KEY ? '***' + process.env.CLOUDINARY_API_KEY.slice(-4) : 'not set',
+    };
+  } catch (error) {
+    diagnostics.services.cloudinary = {
+      status: 'error',
+      error: error.message,
+    };
+  }
+
+  // 4. Check SMTP/Email (if configured)
+  try {
+    const hasSmtp = !!(process.env.SMTP_HOST && process.env.SMTP_USER);
+    diagnostics.services.email = {
+      status: hasSmtp ? 'configured' : 'not_configured',
+      host: process.env.SMTP_HOST || 'not set',
+      user: process.env.SMTP_USER || 'not set',
+    };
+  } catch (error) {
+    diagnostics.services.email = {
+      status: 'error',
+      error: error.message,
+    };
+  }
+
+  // Determine overall status
+  const criticalServices = ['firebase'];
+  const criticalFailed = criticalServices.some(
+    service => diagnostics.services[service]?.status === 'failed'
+  );
+  const optionalFailed = Object.values(diagnostics.services).some(
+    service => service.status === 'failed' && !criticalServices.includes(service)
+  );
+
+  if (criticalFailed) {
+    diagnostics.overall = 'critical_failure';
+  } else if (optionalFailed) {
+    diagnostics.overall = 'partial_failure';
+  } else {
+    diagnostics.overall = 'ok';
+  }
+
+  // Return appropriate status code
+  const statusCode = criticalFailed ? 503 : 200;
+  res.status(statusCode).json(diagnostics);
 }
 
 /**
