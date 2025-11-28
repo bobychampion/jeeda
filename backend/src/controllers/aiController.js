@@ -1,4 +1,4 @@
-import { db } from '../config/firebaseAdmin.js';
+import { db, isFirebaseInitialized, getInitializationError } from '../config/firebaseAdmin.js';
 import { searchTemplates, getTopMatchingTemplateIds } from '../services/templateSearchService.js';
 import { getCachedTemplates } from '../services/templateIndexService.js';
 
@@ -14,6 +14,23 @@ export async function getAIRecommendations(req, res) {
 
     if (!query) {
       return res.status(400).json({ error: 'Query is required' });
+    }
+
+    // Check if Firebase is initialized
+    if (!isFirebaseInitialized() || !db) {
+      const initError = getInitializationError();
+      const errorMsg = initError?.message || 'Firebase Admin not initialized';
+      console.error('❌ Firebase Admin not initialized:', errorMsg);
+      
+      return res.json({
+        recommendations: [],
+        message: "I'm currently unable to access the template database. This is likely because Firebase credentials are not configured on the server. Please contact support.",
+        availableCategories: [],
+        debug: process.env.NODE_ENV === 'development' ? {
+          error: errorMsg,
+          hint: 'Add FIREBASE_PROJECT_ID, FIREBASE_PRIVATE_KEY, and FIREBASE_CLIENT_EMAIL to Render environment variables'
+        } : undefined
+      });
     }
 
     // Fetch templates (using cache for performance)
