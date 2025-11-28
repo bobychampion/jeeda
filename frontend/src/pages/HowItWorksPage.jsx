@@ -1,188 +1,202 @@
 import { Link } from 'react-router-dom';
 import Header from '../components/common/Header';
 import Footer from '../components/common/Footer';
-import { Search, MessageSquare, ShoppingCart, Package, FileText, Wrench, ArrowRight } from 'lucide-react';
-import { useEffect, useRef } from 'react';
+import { Search, MessageSquare, ShoppingCart, Package, FileText, Wrench, DollarSign, CheckCircle, ArrowRight } from 'lucide-react';
 
 export default function HowItWorksPage() {
-  const stepsRef = useRef([]);
-
-  useEffect(() => {
-    // Intersection Observer for scroll animations
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('animate-fade-in');
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
-
-    stepsRef.current.forEach((step) => {
-      if (step) observer.observe(step);
-    });
-
-    return () => {
-      stepsRef.current.forEach((step) => {
-        if (step) observer.unobserve(step);
-      });
-    };
-  }, []);
-
-  const steps = [
-    {
-      number: '01',
-      title: 'Browse & Discover',
-      icon: Search,
-      description: 'Explore our extensive library of furniture templates, from minimalist shelves to rustic coffee tables, and find inspiration for your next project.',
-      imagePlaceholder: 'https://images.unsplash.com/photo-1556912172-45b7cc8d6aef?w=400&h=300&fit=crop',
-    },
-    {
-      number: '02',
-      title: 'Get AI Recommendations',
-      icon: MessageSquare,
-      description: 'Use our AI Chat Assistant to describe what you\'re looking for. Get personalized design recommendations that perfectly match your style, space, and skill level.',
-      imagePlaceholder: 'https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=400&h=300&fit=crop',
-    },
-    {
-      number: '03',
-      title: 'Customize & Order',
-      icon: ShoppingCart,
-      description: 'Adjust dimensions, select materials, and tweak details in our easy-to-use customizer. Once you\'re happy, order your unique plans.',
-      imagePlaceholder: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=300&fit=crop',
-    },
-    {
-      number: '04',
-      title: 'Receive Your Plans',
-      icon: Package,
-      description: 'Instantly receive your comprehensive digital blueprints, step-by-step instructions, and a complete materials list delivered directly to your inbox.',
-      imagePlaceholder: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=400&h=300&fit=crop',
-    },
-    {
-      number: '05',
-      title: 'Gather Materials',
-      icon: FileText,
-      description: 'We provide a complete shopping list for all the necessary tools and materials, making your trip to the hardware store a breeze.',
-      imagePlaceholder: 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=400&h=300&fit=crop',
-    },
-    {
-      number: '06',
-      title: 'Build Your Furniture',
-      icon: Wrench,
-      description: 'Follow the clear, detailed instructions to assemble your piece. Experience the pride and satisfaction of building your own custom furniture.',
-      imagePlaceholder: 'https://images.unsplash.com/photo-1504148455328-c376907d081c?w=400&h=300&fit=crop',
-    },
-  ];
-
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <Header />
       
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-green-50 to-white py-20 md:py-28">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 animate-fade-in">
+      <section className="bg-gradient-to-br from-green-50 via-white to-green-50 py-16 md:py-20">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4">
             How It Works
           </h1>
-          <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto animate-fade-in-delay">
-            Your dream furniture, from idea to reality in six simple steps.
+          <p className="text-xl md:text-2xl text-gray-600 max-w-2xl mx-auto">
+            Your dream furniture, from idea to reality in three simple steps. Build it yourself and save up to 70% compared to store-bought furniture.
           </p>
         </div>
       </section>
 
-      {/* Steps Grid */}
+      {/* Main Steps Section */}
       <section className="py-16 md:py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
-            {steps.map((step, index) => {
-              const Icon = step.icon;
-              return (
-                <div
-                  key={index}
-                  ref={(el) => (stepsRef.current[index] = el)}
-                  className="group opacity-0 transition-all duration-700 ease-out hover:scale-105"
-                >
-                  <div className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 h-full flex flex-col">
-                    {/* Step Number */}
-                    <div className="bg-gradient-to-br from-green-500 to-green-600 text-white px-6 py-4">
-                      <div className="flex items-center justify-between">
-                        <span className="text-3xl font-bold">{step.number}</span>
-                        <Icon className="w-8 h-8 opacity-90" />
-                      </div>
-                    </div>
-
-                    {/* Image Placeholder */}
-                    <div className="relative h-64 bg-gray-200 overflow-hidden">
-                      <div className="absolute inset-0 bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center">
-                        <div className="text-center text-gray-500">
-                          <Icon className="w-16 h-16 mx-auto mb-2 opacity-50" />
-                          <p className="text-sm font-medium">Image Placeholder</p>
-                        </div>
-                      </div>
-                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-300"></div>
-                    </div>
-
-                    {/* Content */}
-                    <div className="p-6 flex-1 flex flex-col">
-                      <h3 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-green-600 transition-colors">
-                        {step.title}
-                      </h3>
-                      <p className="text-gray-600 leading-relaxed flex-1">
-                        {step.description}
-                      </p>
-                    </div>
+          <div className="grid md:grid-cols-3 gap-8 md:gap-12">
+            
+            {/* Step 1 */}
+            <div className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100">
+              <div className="flex items-center justify-center mb-6">
+                <div className="relative">
+                  <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center">
+                    <Search className="w-10 h-10 text-green-600" />
+                  </div>
+                  <div className="absolute -top-2 -right-2 w-8 h-8 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                    01
                   </div>
                 </div>
-              );
-            })}
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-4 text-center">
+                Browse & Discover
+              </h3>
+              <p className="text-gray-600 leading-relaxed text-center">
+                Explore our extensive library of furniture templates, from minimalist shelves to rustic coffee tables. Browse by room type or use our AI Chat Assistant to get personalized recommendations that match your style, space, and skill level.
+              </p>
+            </div>
+
+            {/* Step 2 */}
+            <div className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100">
+              <div className="flex items-center justify-center mb-6">
+                <div className="relative">
+                  <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center">
+                    <ShoppingCart className="w-10 h-10 text-green-600" />
+                  </div>
+                  <div className="absolute -top-2 -right-2 w-8 h-8 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                    02
+                  </div>
+                </div>
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-4 text-center">
+                Customize & Order
+              </h3>
+              <p className="text-gray-600 leading-relaxed text-center">
+                Adjust dimensions, select materials, and tweak details in our easy-to-use customizer. Choose the <strong className="text-green-600">self-assembly option</strong> to reduce costs significantly. Once you're happy, order your unique plans at a fraction of store prices.
+              </p>
+            </div>
+
+            {/* Step 3 */}
+            <div className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100">
+              <div className="flex items-center justify-center mb-6">
+                <div className="relative">
+                  <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center">
+                    <Wrench className="w-10 h-10 text-green-600" />
+                  </div>
+                  <div className="absolute -top-2 -right-2 w-8 h-8 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                    03
+                  </div>
+                </div>
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-4 text-center">
+                Build & Save
+              </h3>
+              <p className="text-gray-600 leading-relaxed text-center">
+                Receive comprehensive digital blueprints, step-by-step instructions, and a complete materials list. Gather materials from your local hardware store and follow our clear, detailed guides to assemble your piece. Experience the pride and satisfaction of building your own custom furniture while saving money.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Cost Savings Section */}
+      <section className="py-16 md:py-24 bg-gradient-to-br from-green-50 to-white">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-white rounded-2xl shadow-xl p-8 md:p-12">
+            <div className="text-center mb-12">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <DollarSign className="w-8 h-8 text-green-600" />
+              </div>
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                Save Money with Self-Assembly
+              </h2>
+              <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+                By choosing our self-assembly option, you can save up to 70% compared to buying similar furniture from stores. Here's how:
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-8 mb-12">
+              <div className="text-center">
+                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <CheckCircle className="w-6 h-6 text-green-600" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">No Labor Costs</h3>
+                <p className="text-gray-600">
+                  Skip expensive assembly services. Our detailed instructions make it easy to build yourself.
+                </p>
+              </div>
+              <div className="text-center">
+                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <CheckCircle className="w-6 h-6 text-green-600" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">Direct Material Purchase</h3>
+                <p className="text-gray-600">
+                  Buy materials directly from hardware stores at wholesale prices, cutting out middlemen.
+                </p>
+              </div>
+              <div className="text-center">
+                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <CheckCircle className="w-6 h-6 text-green-600" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">Customizable Pricing</h3>
+                <p className="text-gray-600">
+                  Choose your own materials and quality level to fit your budget perfectly.
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-green-50 rounded-xl p-6 border border-green-200">
+              <div className="flex items-start gap-4">
+                <Package className="w-8 h-8 text-green-600 flex-shrink-0 mt-1" />
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-2">What You Get</h3>
+                  <ul className="space-y-2 text-gray-700">
+                    <li className="flex items-start gap-2">
+                      <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                      <span>Detailed digital blueprints with precise measurements</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                      <span>Complete materials list with exact quantities</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                      <span>Step-by-step assembly instructions with diagrams</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                      <span>Cutting diagrams and tool requirements</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                      <span>Difficulty rating and estimated build time</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 md:py-20 bg-gradient-to-br from-green-500 to-green-600">
+      <section className="py-16 md:py-24 bg-gradient-to-br from-green-600 to-green-700 text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+          <h2 className="text-4xl md:text-5xl font-bold mb-6">
             Ready to Start Building?
           </h2>
           <p className="text-xl text-green-50 mb-8 max-w-2xl mx-auto">
-            Join thousands of DIY enthusiasts creating beautiful, custom furniture with Jeeda.
+            Join thousands of DIY enthusiasts creating beautiful, custom furniture with Jeeda. Save money and build exactly what you want.
           </p>
-          <Link
-            to="/categories"
-            className="inline-flex items-center gap-3 bg-white text-green-600 px-8 py-4 rounded-lg text-lg font-semibold hover:bg-green-50 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
-          >
-            Start Designing Now
-            <ArrowRight className="w-5 h-5" />
-          </Link>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              to="/categories"
+              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-green-600 rounded-lg text-lg font-semibold hover:bg-green-50 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+            >
+              Browse Templates
+              <ArrowRight className="w-5 h-5" />
+            </Link>
+            <Link
+              to="/ai-assistant"
+              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-transparent text-white border-2 border-white rounded-lg text-lg font-semibold hover:bg-white hover:text-green-600 transition-all duration-300"
+            >
+              Get AI Recommendations
+              <MessageSquare className="w-5 h-5" />
+            </Link>
+          </div>
         </div>
       </section>
 
       <Footer />
-      
-      <style>{`
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        
-        .animate-fade-in {
-          animation: fadeIn 0.8s ease-out forwards;
-        }
-        
-        .animate-fade-in-delay {
-          animation: fadeIn 1s ease-out 0.2s forwards;
-          opacity: 0;
-        }
-      `}</style>
     </div>
   );
 }

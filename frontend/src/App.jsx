@@ -36,9 +36,9 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
+          <Route path="/how-it-works" element={<HowItWorksPage />} />
           <Route path="/categories" element={<CategoryPage />} />
           <Route path="/categories/:categoryId" element={<CategoryPage />} />
-          <Route path="/how-it-works" element={<HowItWorksPage />} />
           <Route path="/templates/:id" element={<ProductDetailPage />} />
           <Route
             path="/ai-assistant"
