@@ -52,7 +52,6 @@ export default function AdminTemplatesPage() {
   const [showNewCategoryInput, setShowNewCategoryInput] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState('');
   const [creatingCategory, setCreatingCategory] = useState(false);
-  const [assigningCategories, setAssigningCategories] = useState(false);
 
   useEffect(() => {
     if (userData?.role !== 'admin') {
@@ -119,58 +118,7 @@ export default function AdminTemplatesPage() {
     }
   };
 
-  const handleRandomAssignCategories = async () => {
-    if (!window.confirm(
-      'This will randomly assign all templates to room categories.\n\n' +
-      'Templates that already have valid room categories will be skipped.\n\n' +
-      'Do you want to continue?'
-    )) {
-      return;
-    }
-
-    setAssigningCategories(true);
-    try {
-      // Get auth token
-      const token = currentUser ? await currentUser.getIdToken() : localStorage.getItem('authToken');
-      
-      if (!token) {
-        throw new Error('You must be logged in to perform this action');
-      }
-      
-      // API_URL is imported from config/api.js
-      const response = await fetch(`${API_URL}/api/templates/assign-categories`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || 'Failed to assign categories');
-      }
-
-      const result = await response.json();
-      
-      alert(
-        `✅ Categories assigned successfully!\n\n` +
-        `Updated: ${result.updated} templates\n` +
-        `Skipped: ${result.skipped} templates\n\n` +
-        `Distribution:\n${Object.entries(result.distribution)
-          .map(([cat, count]) => `  ${cat}: ${count}`)
-          .join('\n')}`
-      );
-
-      // Refresh templates list
-      await fetchTemplates();
-    } catch (error) {
-      console.error('Error assigning categories:', error);
-      alert(`Failed to assign categories: ${error.message}\n\nPlease run the script manually from the backend.`);
-    } finally {
-      setAssigningCategories(false);
-    }
-  };
+  // Removed: handleRandomAssignCategories - Random category assignment disabled
 
   const fetchTemplates = async () => {
     try {
@@ -558,24 +506,6 @@ export default function AdminTemplatesPage() {
           <div className="flex justify-between items-center mb-8">
             <h1 className="text-3xl font-bold text-text-dark">Template Management</h1>
             <div className="flex space-x-3">
-              <button
-                onClick={handleRandomAssignCategories}
-                disabled={assigningCategories}
-                className="flex items-center space-x-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition"
-                title="Randomly assign all templates to room categories"
-              >
-                {assigningCategories ? (
-                  <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    <span>Assigning...</span>
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="w-5 h-5" />
-                    <span>Assign Categories</span>
-                  </>
-                )}
-              </button>
               <button
                 onClick={() => {
                   resetForm();

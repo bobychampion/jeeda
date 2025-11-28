@@ -6,7 +6,6 @@ import {
   createTemplate,
   updateTemplate,
   deleteTemplate,
-  assignTemplatesToRooms,
 } from '../controllers/templateController.js';
 import { verifyAuth, verifyAdmin } from '../middleware/authMiddleware.js';
 
@@ -19,7 +18,7 @@ router.get('/category/:category', getTemplatesByCategory);
 
 // Admin routes
 router.post('/', verifyAuth, verifyAdmin, createTemplate);
-router.post('/assign-categories', verifyAuth, verifyAdmin, assignTemplatesToRooms);
+// Removed: /assign-categories route - Random category assignment disabled
 router.put('/:id', verifyAuth, verifyAdmin, updateTemplate);
 router.delete('/:id', verifyAuth, verifyAdmin, deleteTemplate);
 

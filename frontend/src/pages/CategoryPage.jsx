@@ -39,15 +39,10 @@ export default function CategoryPage() {
     try {
       const filterParams = {};
       
-      // Check if this is a room category or furniture category
+      // Filter by category (use the category field directly, not roomType)
       if (categoryId && categoryId !== 'all') {
-        if (category?.type === 'room') {
-          // Filter by room type
-          filterParams.roomType = category.name.toLowerCase();
-        } else {
-          // Filter by furniture category
-          filterParams.category = categoryId;
-        }
+        // Use category name for filtering (templates have category field set by admin)
+        filterParams.category = category?.name || categoryId;
       }
       
       if (filters.difficulty) filterParams.difficulty = filters.difficulty;
